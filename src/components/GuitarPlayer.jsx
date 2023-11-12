@@ -169,8 +169,8 @@ export const GuitarPlayer = () => {
           onChange={() => setClaqueta(!claqueta)}
         />
       </div>
-      <div className="flex justify-between items-center mt-4 mb-6">
-        <label className="text-sm font-semibold">Inicio:</label>
+      <div className="flex justify-start items-center mt-4 mb-6">
+        <label className="w-12 text-sm font-semibold">Inicio:</label>
         <div className="relative w-3/4 flex flex-row items-center">
           <input
             className=" w-4/5 lg:w-full"
@@ -188,8 +188,8 @@ export const GuitarPlayer = () => {
           </div>
         </div>
       </div>
-      <div className="flex justify-between items-center mt-4">
-        <label className="text-sm font-semibold">Fin:</label>
+      <div className="flex justify-start items-center mt-4">
+        <label className="w-12 text-sm font-semibold">Fin:</label>
         <div className="relative w-3/4 flex flex-row items-center">
           <input
             className=" w-4/5 lg:w-full"
