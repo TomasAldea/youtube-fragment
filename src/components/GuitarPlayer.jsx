@@ -173,7 +173,7 @@ export const GuitarPlayer = () => {
         <label className="text-sm font-semibold">Inicio:</label>
         <div className="relative w-3/4 flex flex-row items-center">
           <input
-            className="w-full"
+            className=" w-4/5 lg:w-full"
             type="range"
             min="0"
             max={totalTime}
@@ -192,7 +192,7 @@ export const GuitarPlayer = () => {
         <label className="text-sm font-semibold">Fin:</label>
         <div className="relative w-3/4 flex flex-row items-center">
           <input
-            className="w-full"
+            className=" w-4/5 lg:w-full"
             type="range"
             min="0"
             max={totalTime}
