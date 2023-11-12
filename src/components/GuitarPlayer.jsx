@@ -104,7 +104,7 @@ export const GuitarPlayer = () => {
   }, [startMarker, endMarker, videoId, claqueta]);
 
   return (
-    <div className="max-w-screen-md mx-auto my-8 p-4 bg-white shadow-md rounded-md">
+    <div className="max-w-screen-md mx-auto mb-8 p-4 bg-white shadow-md rounded-md">
       <audio ref={audioRef} src="metronome.mp3" />{" "}
       {/* Agrega la ruta del archivo de audio */}
       <div className="mb-4">
