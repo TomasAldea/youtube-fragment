@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import YouTube from "react-youtube";
 
 export const GuitarPlayer = () => {
   const [player, setPlayer] = useState(null);
   const [startMarker, setStartMarker] = useState(0);
   const [endMarker, setEndMarker] = useState(0);
+  // Este es para el tiempo, no para el label
+  const [endMarkerTime, setEndMarkerTime] = useState(0);
   const [totalTime, setTotalTime] = useState(0);
   const [videoId, setVideoId] = useState("PvF9PAxe5Ng"); // Video por defecto
   const [videoUrl, setVideoUrl] = useState("");
-  const audioRef = React.createRef(); // Ref para el elemento de audio
   const [claqueta, setClaqueta] = useState(true); // Estado para activar/desactivar audioRef
+  const audioRef = useRef(); // Ref para el elemento de audio
+  const lastChangeTimestamp = useRef(null);
+
+  const pasteFromClipboard = () => {
+    navigator.clipboard.readText().then((clipboardText) => {
+      setVideoUrl(clipboardText);
+    });
+  };
 
   const onReady = (event) => {
     setPlayer(event.target);
@@ -17,27 +26,30 @@ export const GuitarPlayer = () => {
     setTotalTime(duration);
   };
 
+  const func = () => {};
+
   const onPlay = () => {
-    if (startMarker >= endMarker) {
+    if (startMarker >= endMarkerTime) {
       return;
     }
 
     const interval = setInterval(() => {
       const currentTime = player.getCurrentTime().toFixed();
 
-      if (currentTime >= endMarker) {
+      if (currentTime > endMarkerTime) {
         clearInterval(interval);
         player.pauseVideo();
 
-        claqueta && playAudioEverySecond();
-
-        var timeOut = claqueta ? 5000 : 0;
-        setTimeout(() => {
-          player.playVideo();
-          player.seekTo(startMarker);
-        }, timeOut);
+        if (startMarker < endMarkerTime) {
+          claqueta && playClaqueta();
+          var timeOut = claqueta ? 4500 : 0;
+          setTimeout(() => {
+            player.playVideo();
+            player.seekTo(startMarker);
+          }, timeOut);
+        }
       }
-    }, 1000); // Comprueba cada segundo
+    }, 1000);
 
     // Limpia el intervalo cuando se detiene la reproducción
     const onPause = () => clearInterval(interval);
@@ -50,27 +62,34 @@ export const GuitarPlayer = () => {
     };
   };
 
-  const playAudioEverySecond = () => {
-    console.log("hola");
-    let intervalId;
-
-    intervalId = setInterval(() => {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
-    }, 1000);
-
-    // Detener el intervalo después de 4 segundos
-    setTimeout(() => {
-      clearInterval(intervalId);
-    }, 4000);
+  const playClaqueta = () => {
+    audioRef.current.currentTime = 0;
+    audioRef.current.play();
   };
 
-  const handleMarkerChange = (markerType, value) => {
-    if (markerType === "start") {
-      setStartMarker(value);
-    } else {
+  const stopClaqueta = () => {
+    audioRef.current.pause();
+  };
+
+  const handleStartMarkerChange = (value) => {
+    if (endMarkerTime < startMarker) {
       setEndMarker(value);
+      setEndMarkerTime(value);
     }
+    setStartMarker(value);
+
+    player.seekTo(value);
+  };
+
+  const handleEndMarkerChange = (value) => {
+    // Almacenar la marca de tiempo actual
+    lastChangeTimestamp.current = Date.now();
+
+    setTimeout(() => {
+      if (Date.now() - lastChangeTimestamp.current >= 1000) {
+        setEndMarkerTime(value);
+      }
+    }, 1000);
   };
 
   const handleVideoUrlChange = () => {
@@ -98,17 +117,25 @@ export const GuitarPlayer = () => {
 
   // Reinicia el video cuando cambian los marcadores o la URL
   useEffect(() => {
-    if (player && startMarker && endMarker && startMarker <= endMarker) {
+    if (player && startMarker && endMarkerTime) {
       player.loadVideoById(videoId, startMarker);
+      /* stopClaqueta(); */
     }
-  }, [startMarker, endMarker, videoId, claqueta]);
+  }, [endMarkerTime, videoId, startMarker]);
 
   return (
-    <div className="max-w-screen-md mx-auto mb-8 p-4 bg-white shadow-md rounded-md">
+    <div
+      id="player-container"
+      className="max-w-screen-md mx-auto mb-8 mt-8 p-4 bg-white rounded-md"
+    >
       <audio ref={audioRef} src="metronome.mp3" />{" "}
       {/* Agrega la ruta del archivo de audio */}
       <div className="mb-4">
-        <label className="text-sm font-semibold">URL del Video:</label>
+        <div className="flex flex-row">
+          <label className="text-sm font-semibold mr-2 mb-4">URL del Video</label>
+          <img onClick={pasteFromClipboard} className=" cursor-pointer w-5 h-5" src="/images/paste.png" alt="paste" />
+        </div>
+
         <input
           className="w-full border rounded px-2 py-1"
           type="text"
@@ -130,10 +157,11 @@ export const GuitarPlayer = () => {
         iframeClassName="w-full"
         videoId={videoId}
         onReady={onReady}
+        onPause={func}
         onPlay={onPlay}
         opts={{ playerVars: { controls: 1 } }}
       />
-      <div className="mb-4 mt-8 flex flex-row items-center">
+      <div className="mb-4 mt-4 flex flex-row items-center">
         <label className="text-sm font-semibold mr-2">Activar Claqueta:</label>
         <input
           type="checkbox"
@@ -141,9 +169,9 @@ export const GuitarPlayer = () => {
           onChange={() => setClaqueta(!claqueta)}
         />
       </div>
-      <div className="flex justify-between items-center mt-4">
+      <div className="flex justify-between items-center mt-4 mb-6">
         <label className="text-sm font-semibold">Inicio:</label>
-        <div className="relative w-3/4">
+        <div className="relative w-3/4 flex flex-row items-center">
           <input
             className="w-full"
             type="range"
@@ -152,7 +180,7 @@ export const GuitarPlayer = () => {
             step="1"
             value={startMarker}
             onChange={(e) =>
-              handleMarkerChange("start", parseInt(e.target.value, 10))
+              handleStartMarkerChange(parseInt(e.target.value, 10))
             }
           />
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-6 text-xs font-semibold">
@@ -162,7 +190,7 @@ export const GuitarPlayer = () => {
       </div>
       <div className="flex justify-between items-center mt-4">
         <label className="text-sm font-semibold">Fin:</label>
-        <div className="relative w-3/4">
+        <div className="relative w-3/4 flex flex-row items-center">
           <input
             className="w-full"
             type="range"
@@ -170,9 +198,10 @@ export const GuitarPlayer = () => {
             max={totalTime}
             step="1"
             value={endMarker}
-            onChange={(e) =>
-              handleMarkerChange("end", parseInt(e.target.value, 10))
-            }
+            onChange={(e) => {
+              setEndMarker(parseInt(e.target.value, 10));
+              handleEndMarkerChange(parseInt(e.target.value, 10));
+            }}
           />
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-6 text-xs font-semibold">
             {formatTime(endMarker)}

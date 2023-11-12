@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@media (min-width: 1024px){
+    #player-container {
+        height: calc(100vh - 230px);
+    }
+}
+
+footer {
+    box-shadow: 0px -11px 20px 0px #02020230;
+}
