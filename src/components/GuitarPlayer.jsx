@@ -98,7 +98,7 @@ export const GuitarPlayer = () => {
 
   // Reinicia el video cuando cambian los marcadores o la URL
   useEffect(() => {
-    if (player && startMarker && endMarker) {
+    if (player && startMarker && endMarker && startMarker <= endMarker) {
       player.loadVideoById(videoId, startMarker);
     }
   }, [startMarker, endMarker, videoId, claqueta]);
