@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import YouTube from "react-youtube";
+import { Checkbox } from "@nextui-org/react";
+import { Slider } from "@nextui-org/react";
 
 export const GuitarPlayer = () => {
   const [player, setPlayer] = useState(null);
@@ -40,14 +42,12 @@ export const GuitarPlayer = () => {
         clearInterval(interval);
         player.pauseVideo();
 
-       
-          claqueta && playClaqueta();
-          var timeOut = claqueta ? 4500 : 0;
-          setTimeout(() => {
-            player.playVideo();
-            player.seekTo(startMarker);
-          }, timeOut);
-        
+        claqueta && playClaqueta();
+        var timeOut = claqueta ? 4500 : 0;
+        setTimeout(() => {
+          player.playVideo();
+          player.seekTo(startMarker);
+        }, timeOut);
       }
     }, 1000);
 
@@ -72,6 +72,7 @@ export const GuitarPlayer = () => {
   };
 
   const handleStartMarkerChange = (value) => {
+    console.log(value);
     player.pauseVideo();
     stopClaqueta();
     if (endMarkerTime < startMarker) {
@@ -128,14 +129,21 @@ export const GuitarPlayer = () => {
   return (
     <div
       id="player-container"
-      className="max-w-screen-md mx-auto mb-8 mt-8 p-4 bg-white rounded-md"
+      className="max-w-screen-md mx-auto mb-8 mt-8 p-4 rounded-md"
     >
       <audio ref={audioRef} src="metronome.mp3" />{" "}
       {/* Agrega la ruta del archivo de audio */}
       <div className="mb-4">
         <div className="flex flex-row">
-          <label className="text-sm font-semibold mr-2 mb-4">URL del Video</label>
-          <img onClick={pasteFromClipboard} className=" cursor-pointer w-5 h-5" src="/images/paste.png" alt="paste" />
+          <label className="text-sm font-semibold mr-2 mb-4">
+            URL del Video
+          </label>
+          <img
+            onClick={pasteFromClipboard}
+            className=" cursor-pointer w-5 h-5"
+            src="/images/paste.png"
+            alt="paste"
+          />
         </div>
 
         <input
@@ -164,50 +172,44 @@ export const GuitarPlayer = () => {
         opts={{ playerVars: { controls: 1 } }}
       />
       <div className="mb-4 mt-4 flex flex-row items-center">
-        <label className="text-sm font-semibold mr-2">Activar Claqueta:</label>
-        <input
-          type="checkbox"
+        <Checkbox
           checked={claqueta}
+          defaultSelected
           onChange={() => setClaqueta(!claqueta)}
-        />
+        >
+          Activar Claqueta
+        </Checkbox>
       </div>
       <div className="flex justify-start items-center mt-4 mb-6">
-        <label className="w-12 text-sm font-semibold">Inicio:</label>
         <div className="relative w-3/4 flex flex-row items-center">
-          <input
-            className=" w-4/5 lg:w-full"
-            type="range"
-            min="0"
-            max={totalTime}
+          <Slider
+            label="Inicio"
+            size="sm"
             step="1"
+            maxValue={totalTime}
+            getValue={(time) => `${formatTime(time)}`}
+            className="max-w-md"
             value={startMarker}
-            onChange={(e) =>
-              handleStartMarkerChange(parseInt(e.target.value, 10))
-            }
+            onChange={(val) => handleStartMarkerChange(val)}
           />
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-6 text-xs font-semibold">
-            {formatTime(startMarker)}
-          </div>
         </div>
       </div>
       <div className="flex justify-start items-center mt-4">
-        <label className="w-12 text-sm font-semibold">Fin:</label>
         <div className="relative w-3/4 flex flex-row items-center">
-          <input
-            className=" w-4/5 lg:w-full"
-            type="range"
-            min="0"
-            max={totalTime}
+          
+          <Slider
+            label="Fin"
+            size="sm"
             step="1"
+            maxValue={totalTime}
+            getValue={(time) => `${formatTime(time)}`}
+            className="max-w-md"
             value={endMarker}
-            onChange={(e) => {
-              setEndMarker(parseInt(e.target.value, 10));
-              handleEndMarkerChange(parseInt(e.target.value, 10));
+            onChange={(val) => {
+              setEndMarker(val);
+              handleEndMarkerChange(val);
             }}
           />
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-6 text-xs font-semibold">
-            {formatTime(endMarker)}
-          </div>
         </div>
       </div>
     </div>
