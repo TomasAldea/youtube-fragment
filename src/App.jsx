@@ -9,7 +9,7 @@ function App() {
     <NextUIProvider>
       <Header />
       <GuitarPlayer />
-      <Footer />
+      
       <Analytics />
     </NextUIProvider>
   );

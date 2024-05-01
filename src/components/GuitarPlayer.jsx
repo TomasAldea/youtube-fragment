@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import YouTube from "react-youtube";
 import { Checkbox } from "@nextui-org/react";
-import { Slider } from "@nextui-org/react";
+import { Slider, Button } from "@nextui-org/react";
 import { ClipboardIcon } from "@heroicons/react/24/outline";
 
 export const GuitarPlayer = () => {
@@ -127,20 +127,21 @@ export const GuitarPlayer = () => {
   return (
     <div
       id="player-container"
-      className="max-w-screen-md mx-auto mb-8 mt-8 p-4 rounded-md"
+      className="max-w-[95vw] mx-auto mb-8 mt-8 p-4 rounded-md border-[#E65C19] border-1 dark:bg-[#B51B75] lg:max-w-screen-lg"
     >
       <audio ref={audioRef} src="metronome.mp3" />{" "}
       {/* Agrega la ruta del archivo de audio */}
-      <div className="mb-4">
-        <div className="flex flex-row">
-          <label className="text-sm font-semibold mr-2 mb-4">
-            URL del Video
-          </label>
-          <ClipboardIcon
-            className="w-5 h-5 cursor-pointer"
-            onClick={pasteFromClipboard}
-          ></ClipboardIcon>
-        </div>
+      <div className="gap-2 flex-col flex justify-start place-items-start mb-4">
+        
+        <Button
+          onClick={pasteFromClipboard}
+          color="primary"
+          variant="light"
+          className=""
+        >
+          URL del Video
+          <ClipboardIcon className="w-5 h-5 cursor-pointer"></ClipboardIcon>
+        </Button>
 
         <input
           className="w-full border rounded px-2 py-1"
@@ -151,16 +152,18 @@ export const GuitarPlayer = () => {
             /* handleVideoUrlChange(e.target.value); */
           }}
         />
-      </div>
-      <button
-        className="mb-2 bg-blue-500 text-white px-4 py-1 rounded"
+      <Button
+        className=""
+        color="primary"
+        variant="ghost"
         onClick={handleVideoUrlChange}
       >
         Cambiar Video
-      </button>
+      </Button>
+      </div>
       <YouTube
-        className="w-full"
-        iframeClassName="w-full"
+        className="w-full h-72 lg:h-[30vw]"
+        iframeClassName="w-full h-full"
         videoId={videoId}
         onReady={onReady}
         onPause={func}

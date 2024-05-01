@@ -18,12 +18,12 @@ export default {
       themes: {
         dark: {
           colors: {
-            background: '#261C2C',
+            background: '#640D6B',
             primary: {
-              DEFAULT: "#6E85B2",
-              foreground: "#fff",
+              DEFAULT: "#F8D082",
+              foreground: "#EFECEC",
             },
-            focus: "#BEF264",
+            focus: "#F8D082",
           },
         },
       },
