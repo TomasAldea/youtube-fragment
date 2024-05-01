@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import YouTube from "react-youtube";
 import { Checkbox } from "@nextui-org/react";
 import { Slider } from "@nextui-org/react";
+import { ClipboardIcon } from "@heroicons/react/24/outline";
 
 export const GuitarPlayer = () => {
   const [player, setPlayer] = useState(null);
@@ -72,8 +73,6 @@ export const GuitarPlayer = () => {
   };
 
   const handleStartMarkerChange = (value) => {
-    console.log(value);
-    player.pauseVideo();
     stopClaqueta();
     if (endMarkerTime < startMarker) {
       setEndMarkerTime(value);
@@ -86,13 +85,12 @@ export const GuitarPlayer = () => {
 
   const handleEndMarkerChange = (value) => {
     // Almacenar la marca de tiempo actual
-    lastChangeTimestamp.current = Date.now();
 
-    setTimeout(() => {
-      if (Date.now() - lastChangeTimestamp.current >= 1000) {
-        setEndMarkerTime(value);
-      }
-    }, 1000);
+    setEndMarkerTime(value);
+
+    if (startMarker >= endMarkerTime) {
+      player.seekTo(startMarker);
+    }
   };
 
   const handleVideoUrlChange = () => {
@@ -124,7 +122,7 @@ export const GuitarPlayer = () => {
       player.loadVideoById(videoId, startMarker);
       /* stopClaqueta(); */
     }
-  }, [endMarkerTime, videoId, startMarker]);
+  }, [videoId]);
 
   return (
     <div
@@ -138,12 +136,10 @@ export const GuitarPlayer = () => {
           <label className="text-sm font-semibold mr-2 mb-4">
             URL del Video
           </label>
-          <img
+          <ClipboardIcon
+            className="w-5 h-5 cursor-pointer"
             onClick={pasteFromClipboard}
-            className=" cursor-pointer w-5 h-5"
-            src="/images/paste.png"
-            alt="paste"
-          />
+          ></ClipboardIcon>
         </div>
 
         <input
@@ -196,7 +192,6 @@ export const GuitarPlayer = () => {
       </div>
       <div className="flex justify-start items-center mt-4">
         <div className="relative w-3/4 flex flex-row items-center">
-          
           <Slider
             label="Fin"
             size="sm"
