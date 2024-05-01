@@ -8,7 +8,7 @@ export const GuitarPlayer = () => {
   // Este es para el tiempo, no para el label
   const [endMarkerTime, setEndMarkerTime] = useState(0);
   const [totalTime, setTotalTime] = useState(0);
-  const [videoId, setVideoId] = useState("PvF9PAxe5Ng"); // Video por defecto
+  const [videoId, setVideoId] = useState("xMV6l2y67rk"); // Video por defecto
   const [videoUrl, setVideoUrl] = useState("");
   const [claqueta, setClaqueta] = useState(true); // Estado para activar/desactivar audioRef
   const audioRef = useRef(); // Ref para el elemento de audio
@@ -32,22 +32,22 @@ export const GuitarPlayer = () => {
     if (startMarker >= endMarkerTime) {
       return;
     }
-
+    stopClaqueta();
     const interval = setInterval(() => {
-      const currentTime = player.getCurrentTime().toFixed();
+      const currentTime = player.getCurrentTime()?.toFixed();
 
-      if (currentTime > endMarkerTime) {
+      if (currentTime == endMarkerTime) {
         clearInterval(interval);
         player.pauseVideo();
 
-        if (startMarker < endMarkerTime) {
+       
           claqueta && playClaqueta();
           var timeOut = claqueta ? 4500 : 0;
           setTimeout(() => {
             player.playVideo();
             player.seekTo(startMarker);
           }, timeOut);
-        }
+        
       }
     }, 1000);
 
@@ -72,9 +72,11 @@ export const GuitarPlayer = () => {
   };
 
   const handleStartMarkerChange = (value) => {
+    player.pauseVideo();
+    stopClaqueta();
     if (endMarkerTime < startMarker) {
-      setEndMarker(value);
       setEndMarkerTime(value);
+      setEndMarker(value);
     }
     setStartMarker(value);
 

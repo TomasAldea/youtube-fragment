@@ -9,6 +9,7 @@ function App() {
     <>
       <Header/>
       <GuitarPlayer/>
+      
       <Footer/>
       <Analytics />
     </>
