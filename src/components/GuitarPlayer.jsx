@@ -3,18 +3,21 @@ import YouTube from "react-youtube";
 import { Checkbox } from "@nextui-org/react";
 import { Slider, Button } from "@nextui-org/react";
 import { ClipboardIcon } from "@heroicons/react/24/outline";
+import { SoloSelector } from "./SoloSelector";
 
 export const GuitarPlayer = () => {
   const [player, setPlayer] = useState(null);
-  const [startMarker, setStartMarker] = useState(0);
-  const [endMarker, setEndMarker] = useState(0);
-  // Este es para el tiempo, no para el label
-  const [endMarkerTime, setEndMarkerTime] = useState(0);
+  const [startMarker, setStartMarker] = useState(null);
+  const [endMarker, setEndMarker] = useState(null);
+  const [endMarkerTime, setEndMarkerTime] = useState(null);
   const [totalTime, setTotalTime] = useState(0);
   const [videoId, setVideoId] = useState("xMV6l2y67rk"); // Video por defecto
   const [videoUrl, setVideoUrl] = useState("");
   const [claqueta, setClaqueta] = useState(true); // Estado para activar/desactivar audioRef
   const audioRef = useRef(); // Ref para el elemento de audio
+  const playerRef = useRef();
+
+  const [playbackRate, setPlaybackRate] = useState(1);
   const lastChangeTimestamp = useRef(null);
 
   const pasteFromClipboard = () => {
@@ -27,6 +30,10 @@ export const GuitarPlayer = () => {
     setPlayer(event.target);
     const duration = event.target.getDuration();
     setTotalTime(duration);
+    if (startMarker) {
+      event.target.seekTo(startMarker);
+      player?.seekTo(startMarker);
+    }
   };
 
   const func = () => {};
@@ -35,6 +42,7 @@ export const GuitarPlayer = () => {
     if (startMarker >= endMarkerTime) {
       return;
     }
+
     stopClaqueta();
     const interval = setInterval(() => {
       const currentTime = player.getCurrentTime()?.toFixed();
@@ -61,6 +69,10 @@ export const GuitarPlayer = () => {
       clearInterval(interval);
       player.removeEventListener("onPause", onPause);
     };
+  };
+
+  const audioSpeed = (speed) => {
+    console.log(playerRef.current);
   };
 
   const playClaqueta = () => {
@@ -117,12 +129,6 @@ export const GuitarPlayer = () => {
   };
 
   // Reinicia el video cuando cambian los marcadores o la URL
-  useEffect(() => {
-    if (player && startMarker && endMarkerTime) {
-      player.loadVideoById(videoId, startMarker);
-      /* stopClaqueta(); */
-    }
-  }, [videoId]);
 
   return (
     <div
@@ -132,7 +138,6 @@ export const GuitarPlayer = () => {
       <audio ref={audioRef} src="metronome.mp3" />{" "}
       {/* Agrega la ruta del archivo de audio */}
       <div className="gap-2 flex-col flex justify-start place-items-start mb-4">
-        
         <Button
           onClick={pasteFromClipboard}
           color="primary"
@@ -142,7 +147,14 @@ export const GuitarPlayer = () => {
           URL del Video
           <ClipboardIcon className="w-5 h-5 cursor-pointer"></ClipboardIcon>
         </Button>
-
+        <SoloSelector
+          video={videoId}
+          setVideo={setVideoId}
+          start={setStartMarker}
+          end={setEndMarker}
+          end2={setEndMarkerTime}
+          player={player}
+        ></SoloSelector>
         <input
           className="w-full border rounded px-2 py-1"
           type="text"
@@ -152,14 +164,14 @@ export const GuitarPlayer = () => {
             /* handleVideoUrlChange(e.target.value); */
           }}
         />
-      <Button
-        className=""
-        color="primary"
-        variant="ghost"
-        onClick={handleVideoUrlChange}
-      >
-        Cambiar Video
-      </Button>
+        <Button
+          className=""
+          color="primary"
+          variant="ghost"
+          onClick={handleVideoUrlChange}
+        >
+          Cambiar Video
+        </Button>
       </div>
       <YouTube
         className="w-full h-72 lg:h-[30vw]"
@@ -168,7 +180,8 @@ export const GuitarPlayer = () => {
         onReady={onReady}
         onPause={func}
         onPlay={onPlay}
-        opts={{ playerVars: { controls: 1 } }}
+        controls
+        ref={playerRef}
       />
       <div className="mb-4 mt-4 flex flex-row items-center">
         <Checkbox
@@ -209,6 +222,24 @@ export const GuitarPlayer = () => {
             }}
           />
         </div>
+        <div className="flex justify-start items-center mt-4 mb-6">
+          {/*<select
+            value={playbackRate}
+            onChange={(e) => setPlaybackRate(parseFloat(e.target.value))}
+            className="block w-24 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          >
+            <option value="0.25">0.25x</option>
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1">1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>*/}
+        </div>
+        <button onClick={() => audioSpeed(0.5)}>x0.5</button>
+        <button onClick={() => audioSpeed(1)}>x1</button>
+        <button onClick={() => audioSpeed(2)}>x2</button>
       </div>
     </div>
   );
